@@ -1,0 +1,100 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}">
+{{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+{% block header %}{% endblock %}
+
+
+{% if user.is_authenticated %}
+<p class="errornote">
+{% blocktranslate trimmed %}
+    You are authenticated as {{ username }}, but are not authorized to
+    access this page. Would you like to login to a different account?
+{% endblocktranslate %}
+</p>
+{% endif %}
+<div class="container py-5">
+  <div class="row d-flex justify-content-center align-items-center">
+      <div class="col-xl-6">
+          <div class="card rounded-3 text-black">
+              <div class="row g-0">
+                  <div class="col-lg-12">
+                      <div class="card-body p-md-3 mx-md-3">
+                          <div class="text-center">
+                              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
+                                  style="width: 185px;" alt="logo">
+                              <h4 class="mt-1 mb-5 pb-1">{{ site_header|default:_('Django administration') }}</h4>
+
+                                {% if form.errors and not form.non_field_errors %}
+                                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {% if form.errors.items|length == 1 %}
+                                      {% translate "Please correct the error below." %}
+                                    {% else %}
+                                      {% translate "Please correct the errors below." %}{% endif %}
+                                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                  </div>
+                                {% endif %}
+
+                                {% if form.non_field_errors %}
+                                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {% for error in form.non_field_errors %}
+                                      {{ error }}
+                                    {% endfor %}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                  </div>
+                                {% endif %}
+                          </div>
+
+                          <form action="{{ app_path }}" method="post" id="login-form">
+                              {% csrf_token %}
+                              <div class="form-outline mb-4">
+                                <label for="id_username" class="required">{{ form.username.label }}:</label>
+                                <input id="id_username" maxlength="254" name="username" type="text" class="form-control">
+                                {{ form.username.errors }}
+                              </div>
+
+                              <div class="form-outline mb-4">
+                                  <label for="id_password" class="required">{% trans 'Password:' %}</label>
+                                  <input id="id_password" name="password" type="password" class="form-control">
+                                  {{ form.password.errors }}
+                                  <input type="hidden" name="next" value="{{ next }}">
+                              </div>
+
+                              <div class="text-center pt-1 mb-5 pb-1 d-grid gap-2">
+                                <button class="btn btn-primary btn-block mb-3 gradient-custom-2" type="submit">{% translate 'Log in' %}</button>
+                                {% url 'admin_password_reset' as password_reset_url %}
+                                {% if password_reset_url %}
+                                <div class="password-reset-link">
+                                  <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+                                </div>
+                                {% endif %}
+                                
+                              </div>
+                          </form>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}
+  
